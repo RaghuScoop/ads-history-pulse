@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import FilterPanel from '@/components/FilterPanel';
 import MetricCard from '@/components/MetricCard';
+import ComparisonMetricCard from '@/components/ComparisonMetricCard';
 import CustomLineChart from '@/components/charts/LineChart';
 import CustomBarChart from '@/components/charts/BarChart';
 
@@ -36,6 +37,8 @@ const Index = () => {
     campaign: 'all',
     adGroup: 'all',
     changeEvent: 'all',
+    exactChangeEvent: 'all',
+    changeType: 'all',
     dateRange: '30d',
   });
 
@@ -49,49 +52,59 @@ const Index = () => {
 
   const renderOverview = () => (
     <div className="space-y-6">
-      {/* Key Metrics */}
+      {/* Key Metrics - Comparative View */}
       <div className="dashboard-grid">
-        <MetricCard
+        <ComparisonMetricCard
           title="Total Impressions"
-          value="95.2K"
-          change={12.5}
-          changeLabel="vs last period"
-          trend="up"
+          beforeValue="84.7K"
+          afterValue="95.2K"
+          absoluteChange="+10.5K"
+          percentageChange={12.5}
+          changeDate="2 days ago"
+          isAnomalous={true}
+          severity="medium"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Click-Through Rate"
-          value="6.82%"
-          change={-2.1}
-          changeLabel="vs last period"
-          trend="down"
+          beforeValue="6.97%"
+          afterValue="6.82%"
+          absoluteChange="-0.15%"
+          percentageChange={-2.1}
+          changeDate="1 day ago"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Average CPC"
-          value="$1.43"
-          change={3.2}
-          changeLabel="vs last period"
-          trend="up"
+          beforeValue="$1.38"
+          afterValue="$1.43"
+          absoluteChange="+$0.05"
+          percentageChange={3.2}
+          changeDate="3 hours ago"
+          isAnomalous={true}
+          severity="high"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Cost per Conversion"
-          value="$28.50"
-          change={-8.7}
-          changeLabel="vs last period"
-          trend="down"
+          beforeValue="$31.20"
+          afterValue="$28.50"
+          absoluteChange="-$2.70"
+          percentageChange={-8.7}
+          changeDate="6 hours ago"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Quality Score"
-          value="7.8"
-          change={0.0}
-          changeLabel="vs last period"
-          trend="neutral"
+          beforeValue="7.8"
+          afterValue="7.8"
+          absoluteChange="0.0"
+          percentageChange={0.0}
+          changeDate="No change"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Impression Share"
-          value="73.5%"
-          change={5.4}
-          changeLabel="vs last period"
-          trend="up"
+          beforeValue="69.7%"
+          afterValue="73.5%"
+          absoluteChange="+3.8%"
+          percentageChange={5.4}
+          changeDate="4 hours ago"
         />
       </div>
 

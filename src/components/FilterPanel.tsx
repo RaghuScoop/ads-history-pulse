@@ -9,6 +9,8 @@ interface FilterPanelProps {
     campaign: string;
     adGroup: string;
     changeEvent: string;
+    exactChangeEvent: string;
+    changeType: string;
     dateRange: string;
   };
   onFilterChange: (key: string, value: string) => void;
@@ -34,7 +36,7 @@ const FilterPanel = ({ filters, onFilterChange, onRefresh }: FilterPanelProps) =
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-text-secondary">Campaign</label>
           <Select value={filters.campaign} onValueChange={(value) => onFilterChange('campaign', value)}>
@@ -80,6 +82,43 @@ const FilterPanel = ({ filters, onFilterChange, onRefresh }: FilterPanelProps) =
               <SelectItem value="keyword-changes">Keyword Changes</SelectItem>
               <SelectItem value="ad-changes">Ad Changes</SelectItem>
               <SelectItem value="targeting-changes">Targeting Changes</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-text-secondary">Exact Change Event</label>
+          <Select value={filters.exactChangeEvent} onValueChange={(value) => onFilterChange('exactChangeEvent', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select exact event" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Exact Events</SelectItem>
+              <SelectItem value="bid-increase">Bid Increase</SelectItem>
+              <SelectItem value="bid-decrease">Bid Decrease</SelectItem>
+              <SelectItem value="budget-increase">Budget Increase</SelectItem>
+              <SelectItem value="budget-decrease">Budget Decrease</SelectItem>
+              <SelectItem value="keyword-add">Keyword Added</SelectItem>
+              <SelectItem value="keyword-pause">Keyword Paused</SelectItem>
+              <SelectItem value="ad-enabled">Ad Enabled</SelectItem>
+              <SelectItem value="ad-paused">Ad Paused</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-text-secondary">Change Type</label>
+          <Select value={filters.changeType} onValueChange={(value) => onFilterChange('changeType', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select change type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="automated">Automated Changes</SelectItem>
+              <SelectItem value="manual">Manual Changes</SelectItem>
+              <SelectItem value="bulk">Bulk Changes</SelectItem>
+              <SelectItem value="script">Script Changes</SelectItem>
+              <SelectItem value="rule-based">Rule-based Changes</SelectItem>
             </SelectContent>
           </Select>
         </div>
