@@ -6,6 +6,7 @@ import MetricCard from '@/components/MetricCard';
 import ComparisonMetricCard from '@/components/ComparisonMetricCard';
 import CustomLineChart from '@/components/charts/LineChart';
 import CustomBarChart from '@/components/charts/BarChart';
+import { cn } from '@/lib/utils';
 
 // Mock data for demonstration
 const generateTimeSeriesData = () => [
@@ -249,50 +250,193 @@ const Index = () => {
   const renderSearchTerms = () => (
     <div className="space-y-6">
       <div className="dashboard-grid">
-        <MetricCard
+        <ComparisonMetricCard
           title="New Search Terms"
-          value="342"
-          change={18.7}
-          changeLabel="vs last period"
-          trend="up"
+          beforeValue="289"
+          afterValue="342"
+          absoluteChange="+53"
+          percentageChange={18.7}
+          changeDate="This period"
         />
-        <MetricCard
+        <ComparisonMetricCard
           title="Query Match Rate"
-          value="94.2%"
-          change={1.8}
-          changeLabel="vs last period"
-          trend="up"
+          beforeValue="92.5%"
+          afterValue="94.2%"
+          absoluteChange="+1.7%"
+          percentageChange={1.8}
+          changeDate="vs last period"
         />
-        <MetricCard
-          title="Negative Keywords"
-          value="156"
-          change={23.4}
-          changeLabel="added this period"
-          trend="up"
+        <ComparisonMetricCard
+          title="Negative Keywords Added"
+          beforeValue="126"
+          afterValue="156"
+          absoluteChange="+30"
+          percentageChange={23.4}
+          changeDate="This period"
+          isAnomalous={true}
+          severity="medium"
         />
       </div>
       
       <div className="chart-container">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">Search Term Performance</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Search Term Performance Changes</h3>
         <div className="space-y-4">
           {[
-            { term: 'google ads management', impressions: 2847, clicks: 189, ctr: 6.64, cpc: 1.23 },
-            { term: 'ppc advertising services', impressions: 1956, clicks: 142, ctr: 7.26, cpc: 1.45 },
-            { term: 'digital marketing agency', impressions: 3241, clicks: 198, ctr: 6.11, cpc: 1.67 },
-            { term: 'search engine marketing', impressions: 1632, clicks: 87, ctr: 5.33, cpc: 1.89 },
-          ].map((term, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-surface-secondary rounded-lg">
-              <div className="flex-1">
-                <h4 className="font-medium text-text-primary">{term.term}</h4>
-                <div className="flex items-center space-x-4 mt-1 text-sm text-text-secondary">
-                  <span>{term.impressions.toLocaleString()} impressions</span>
-                  <span>{term.clicks} clicks</span>
-                  <span>{term.ctr}% CTR</span>
-                  <span>${term.cpc} CPC</span>
+            { 
+              term: 'google ads management', 
+              before: { impressions: 2547, clicks: 167, cost: 198.50, cpc: 1.19, conversions: 8 },
+              after: { impressions: 2847, clicks: 189, cost: 232.47, cpc: 1.23, conversions: 12 },
+              changeDate: '3 hours ago',
+              isAnomalous: true,
+              severity: 'medium' as const
+            },
+            { 
+              term: 'ppc advertising services', 
+              before: { impressions: 1756, clicks: 128, cost: 179.20, cpc: 1.40, conversions: 6 },
+              after: { impressions: 1956, clicks: 142, cost: 205.90, cpc: 1.45, conversions: 9 },
+              changeDate: '1 day ago',
+              isAnomalous: false,
+              severity: 'low' as const
+            },
+            { 
+              term: 'digital marketing agency', 
+              before: { impressions: 2941, clicks: 168, cost: 267.12, cpc: 1.59, conversions: 7 },
+              after: { impressions: 3241, clicks: 198, cost: 330.66, cpc: 1.67, conversions: 11 },
+              changeDate: '5 hours ago',
+              isAnomalous: true,
+              severity: 'high' as const
+            },
+            { 
+              term: 'search engine marketing', 
+              before: { impressions: 1432, clicks: 76, cost: 135.24, cpc: 1.78, conversions: 3 },
+              after: { impressions: 1632, clicks: 87, cost: 164.43, cpc: 1.89, conversions: 4 },
+              changeDate: '2 days ago',
+              isAnomalous: false,
+              severity: 'low' as const
+            },
+          ].map((term, index) => {
+            const getPercentageChange = (before: number, after: number) => {
+              if (before === 0) return after > 0 ? 100 : 0;
+              return ((after - before) / before) * 100;
+            };
+
+            const getBorderStyle = () => {
+              if (!term.isAnomalous) return '';
+              const severityBorders = {
+                low: 'border-l-4 border-l-yellow-500',
+                medium: 'border-l-4 border-l-orange-500',
+                high: 'border-l-4 border-l-red-500'
+              };
+              return severityBorders[term.severity];
+            };
+
+            return (
+              <div key={index} className={cn(
+                "p-6 bg-surface rounded-lg border border-card-border",
+                getBorderStyle(),
+                term.isAnomalous && "bg-surface-secondary"
+              )}>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-text-primary text-lg">{term.term}</h4>
+                  <div className="flex items-center space-x-2">
+                    {term.isAnomalous && (
+                      <span className={cn(
+                        "px-2 py-1 rounded text-xs font-medium",
+                        term.severity === 'high' ? 'bg-red-100 text-red-800' :
+                        term.severity === 'medium' ? 'bg-orange-100 text-orange-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      )}>
+                        {term.severity.toUpperCase()} ANOMALY
+                      </span>
+                    )}
+                    <span className="text-sm text-text-muted">{term.changeDate}</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-5 gap-4">
+                  {/* Impressions */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-text-secondary">Impressions</h5>
+                    <div className="space-y-1">
+                      <div className="text-xs text-text-muted">Before: {term.before.impressions.toLocaleString()}</div>
+                      <div className="text-sm font-semibold text-text-primary">After: {term.after.impressions.toLocaleString()}</div>
+                      <div className={cn(
+                        "text-xs font-medium",
+                        getPercentageChange(term.before.impressions, term.after.impressions) > 0 ? 'text-accent-green' : 'text-accent-red'
+                      )}>
+                        {getPercentageChange(term.before.impressions, term.after.impressions) > 0 ? '+' : ''}
+                        {getPercentageChange(term.before.impressions, term.after.impressions).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Clicks */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-text-secondary">Clicks</h5>
+                    <div className="space-y-1">
+                      <div className="text-xs text-text-muted">Before: {term.before.clicks}</div>
+                      <div className="text-sm font-semibold text-text-primary">After: {term.after.clicks}</div>
+                      <div className={cn(
+                        "text-xs font-medium",
+                        getPercentageChange(term.before.clicks, term.after.clicks) > 0 ? 'text-accent-green' : 'text-accent-red'
+                      )}>
+                        {getPercentageChange(term.before.clicks, term.after.clicks) > 0 ? '+' : ''}
+                        {getPercentageChange(term.before.clicks, term.after.clicks).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cost */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-text-secondary">Cost</h5>
+                    <div className="space-y-1">
+                      <div className="text-xs text-text-muted">Before: ${term.before.cost.toFixed(2)}</div>
+                      <div className="text-sm font-semibold text-text-primary">After: ${term.after.cost.toFixed(2)}</div>
+                      <div className={cn(
+                        "text-xs font-medium",
+                        getPercentageChange(term.before.cost, term.after.cost) > 0 ? 'text-accent-red' : 'text-accent-green'
+                      )}>
+                        {getPercentageChange(term.before.cost, term.after.cost) > 0 ? '+' : ''}
+                        {getPercentageChange(term.before.cost, term.after.cost).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CPC */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-text-secondary">CPC</h5>
+                    <div className="space-y-1">
+                      <div className="text-xs text-text-muted">Before: ${term.before.cpc.toFixed(2)}</div>
+                      <div className="text-sm font-semibold text-text-primary">After: ${term.after.cpc.toFixed(2)}</div>
+                      <div className={cn(
+                        "text-xs font-medium",
+                        getPercentageChange(term.before.cpc, term.after.cpc) > 0 ? 'text-accent-red' : 'text-accent-green'
+                      )}>
+                        {getPercentageChange(term.before.cpc, term.after.cpc) > 0 ? '+' : ''}
+                        {getPercentageChange(term.before.cpc, term.after.cpc).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Conversions */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-text-secondary">Conversions</h5>
+                    <div className="space-y-1">
+                      <div className="text-xs text-text-muted">Before: {term.before.conversions}</div>
+                      <div className="text-sm font-semibold text-text-primary">After: {term.after.conversions}</div>
+                      <div className={cn(
+                        "text-xs font-medium",
+                        getPercentageChange(term.before.conversions, term.after.conversions) > 0 ? 'text-accent-green' : 'text-accent-red'
+                      )}>
+                        {getPercentageChange(term.before.conversions, term.after.conversions) > 0 ? '+' : ''}
+                        {getPercentageChange(term.before.conversions, term.after.conversions).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
